@@ -1,0 +1,22 @@
+\begin{thebibliography}{1}
+
+\bibitem{intel}
+Intel\textsuperscript{\textregistered}.
+\newblock {Intel\textsuperscript{\textregistered} Core\textsuperscript{TM}
+  i5-4200U Processor}.
+\newblock Online.
+\newblock
+  \url{https://ark.intel.com/products/75459/Intel-Core-i5-4200U-Processor-3M-Cache-up-to-2_60-GHz}.
+
+\bibitem{mpich}
+{Mathematics and Computer Science Division, Argonne National Laboratory}.
+\newblock Online.
+\newblock \url{www.mpich.org}.
+
+\bibitem{mpe}
+{Mathematics and Computer Science Division, Argonne National Laboratory}.
+\newblock Online.
+\newblock
+  \url{http://www.mcs.anl.gov/research/projects/perfvis/download/index.htm#MPE}.
+
+\end{thebibliography}

@@ -1,0 +1,116 @@
+\documentclass[reprint, amsmath, amssymb, aps, floatfix]{revtex4-1}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bm}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{justification=raggedright,
+	singlelinecheck=false}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage[english]{babel}
+\usepackage[autostyle, english = american]{csquotes}
+\MakeOuterQuote{"}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, allcolors=blue}
+\def\inline{\lstinline[basicstyle=\ttfamily,keywordstyle={}]}
+
+
+
+
+\begin{document}
+
+\title{A Parallel Computational Investigation of Poisson's Equation}
+
+\author{Alec Wills}
+\email{alec.wills@stonybrook.edu}
+\affiliation{Department of Physics and Astronomy\\Stony Brook University\\Stony Brook, NY 11794-3800, USA}
+\date{May 4, 2018}
+
+\begin{abstract}
+	We investigate  parallel processing in numerically solving the Poisson equation in two dimensions. A mesh of points defining the domain of $\mathbb{R}^2$ in which we solve the equation is decomposed along one dimension and sent to different processes. These processes then relax their subdomain via Jacobi iteration and communicate results with processes carrying neighbor subdomains, so that further relaxation may occur. When relaxation yields a total error of no more than $10^{-6}$, the 
+\end{abstract}
+
+\maketitle
+
+\section{Introduction \& Motivation}
+
+Computational studies of intractable problems are becoming increasingly popular (and important) in gleaning information about the system in question. In an ever increasingly technological world, efficiency at analyzing and computing data is a key factor in the success of many fields of research as well as in general industry. For this reason, an investigation into parallel computing becomes essential in learning the basic techniques being employed by cutting edge institutions in their work with large amounts of information.
+
+
+
+\section{Theory/Other Title}
+
+\subsection{An Analytical Solution}
+
+We here put forth an analytical solution to the sourceless Poisson equation \begin{equation}
+\nabla^2\phi(x,y)=0 \label{sourceless}
+\end{equation} defined in a rectangular region $[0, a]\times [0, b]$ with boundary conditions
+\begin{equation}
+\begin{aligned}
+\phi(0, y) &= 0 \\
+\phi(a, y) &= 0\\
+\phi(x, 0) &= 0\\
+\phi(x, b) &= f(x)
+\end{aligned}
+\end{equation} where the upper border's boundary condition will remain arbitrary until we specify its form. Since Eq. \ref{sourceless} is linear and homogeneous, we assume that $phi(x,y)$ is separable such that \begin{equation} \phi(x,y)=X(x)Y(y). \label{separable} \end{equation} Now using this form of $\phi(x,y)$ and plugging into the Eq. \ref{sourceless} yields two decoupled ordinary differential equations \begin{equation}
+\frac{X''(x)}{X(x)} = -\frac{Y''(y)}{Y(y)} = - \lambda, \label{separated}
+\end{equation} and it is these equations with which we construct a solution. The minus sign in front of $\lambda$ is chosen for convenience. The solution to this type of differential equation is well-known, and we begin by stating the solution for $X(x)$: \begin{equation}
+X(x) = A\sin\left(\frac{n\pi x}{a}\right), \label{xeq}
+\end{equation} where we've enforced the boundary conditions $X(0, y)=X(a, y)=0$. This therefore determines the separation constant \begin{equation}
+\lambda = \left(\frac{n\pi}{a}\right)^2 \label{lambda}
+\end{equation} which we may use to solve the differential equation for $Y(y)$, subject to $Y(0)=0$ and $Y(b)=f(x)$. With the constant determined and positive, we thus have another well known studied solution \begin{equation}
+Y(y) = B\sinh\left(\frac{n\pi y}{a}\right), \label{yeq}
+\end{equation} where again we've imposed the grounded boundary condition to remove the $\cosh(y)$ term. We thus have a solution for $\phi(x,y)$ solving the three homogeneous boundary conditions, but have yet to fix the solution to fit the nonhomogeneous condition at $\phi(x,b)$. To do so, we use the superposition principle and dial the constants of the sum to be such that the upper boundary condition is satisfied: \begin{equation}
+\phi(x,y)=\sum_{n=1}^\infty c_n \sin\left(\frac{n\pi x}{a}\right)\sinh\left(\frac{n\pi y}{a}\right) \label{phisum}.
+\end{equation}
+
+In dialing the solution, we must choose coefficients satisfying \begin{equation}
+f(x)=\sum_{n=1}^\infty c_n \sin\left(\frac{n\pi x}{a}\right)\sinh\left(\frac{n\pi b}{a}\right). \label{feq}\end{equation} We note that the expansion on the right hand side is the Fourier decomposition of $f(x)$. We utilize the orthogonality of the Fourier sine functions, and take the inner product (in the integral sense) of both sides. \begin{equation}
+\begin{aligned}
+&\int_{0}^{a}dx\cdot f(x)\sin\left(\frac{m\pi x}{a}\right)\\&= \sum_{n=1}^\infty c_n \sinh\left(\frac{n\pi b}{a}\right)\\&\times\int_0^a dx\cdot \sin\left(\frac{n\pi x}{a}\right)\sin\left(\frac{m \pi x}{a}\right).
+\end{aligned}
+\end{equation} The orthogonality yields a term proportional to $\delta_{mn}$ from the integration, which collapses the summation to a single term. The proportionality factor is just $\frac{a}{2}$, as shown in Appendix A. Thus we have reached \begin{equation}
+c_n = \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)} \int_{0}^{a} dx\cdot f(x)\sin\left(\frac{n\pi x}{a}\right). \label{constant}
+\end{equation}
+
+The boundary condition $f(x)$ above is completely arbitrary, but at this point one needs to specify an explicit form and construct the coefficients term by term to carry out the sum to a desired precision. We here specify that the given boundary potential used in the simulations is \begin{equation}
+f(x)=5x-100 \label{fofx}
+\end{equation} and state the final result for the coefficient formula, referring the reader to Appendix B for the derivation: \begin{equation}
+\begin{aligned}
+c_n =& \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)}\times\biggl[\frac{-5a}{n^2\pi^2}\biggl(20n\pi\\
+&+(a-20)n\pi\cos(n\pi)-a\sin(n\pi)\biggr)\biggr].
+\label{finalceq}
+\end{aligned}
+\end{equation} Thus we have found an analytical solution solving the Poisson equation with the specified boundary potential.
+
+Implementations of nonzero boundary terms are, of course, possible for the other sides of the region, and the above analysis extends to each side so long as the boundary conditions are linear. One may use the superposition principle to construct an arbitrary solution to boundary potentials at each side so long as the series functions are constructed individually -- that is, for each solution you can only assume one side is nonzero.
+
+\section{Methods}
+
+\subsection{Computational Environment}
+
+All simulations were coded in modern Fortran and compiled using GNU Fortran 7.2.0's compiler. The workstation on which the simulations were run is the author's personal laptop, containing four Intel\textsuperscript{\textregistered}  Core\textsuperscript{TM} i5-4200U CPUs, with a base process frequency of 1.60GHz \cite{intel}. The MPI interface used in compilation and coding was MPICH2 1.5rc3 \cite{mpich}, which, despite being outdated, was utilized primarily for its default inclusion of the MPE 2.4.6 processor timing utility \cite{mpe}. Code submitted for grading via Blackboard does not contain this timing utility due to lack of default inclusion on the Mathlab MPICH 3.0.4 versions.
+
+Some simulations were run on Stony Brook University's Mathlab machines as the network \inline{compute.mathlab.stonybrook.edu} allowed for computation with 8 CPUs, although simulations run on these machines were much less thorough and more for benchmarking purposes. 
+
+Plots were generated using Python 3.6.5, with the \inline{matplotlib} 2.2.2 package, and most notably its subpackage \inline{pyplot}. Some analytical work was also done using Mathematica 11.2.
+
+
+
+\appendix{Appendix A. Fourier Orthogonality}
+
+\appendix{Appendix B. Coefficient Determination}
+
+
+\bibliographystyle{unsrt}%Used BibTeX style is unsrt
+\bibliography{refs}
+
+
+
+
+
+\end{document}
