@@ -6,7 +6,7 @@
 
 ! Begin module:
 MODULE mpi_funcs
-USE mpi
+USE MPI
 ! Require explicit variable declaration and save for use
 IMPLICIT NONE
 SAVE
@@ -56,14 +56,14 @@ INTEGER, INTENT(IN) :: comm1d, nbrbottom, nbrtop  ! Communicator grouping the de
 REAL(KIND=8), INTENT(IN) :: a(0:nx+1, s-1:e+1)    ! The grid to send/receive values
 
 INTEGER :: ierr   ! Local variable for routines
+
 ! Sends the nx+1 values in the e-row of a given process to the process above it, storing in the ghost zone
 ! Labels as having been received from below
 ! Note: a(0, y) is fixed by boundary conditions, so we needn't deal with sending that information again
-
 CALL MPI_SENDRECV( a(1,e), nx, MPI_DOUBLE_PRECISION, nbrtop, 0, a(1,s-1), nx, MPI_DOUBLE_PRECISION, &
                     nbrbottom, 0, comm1d, MPI_STATUS_IGNORE, ierr)
-! Does the same thing, but to the process below as though it was from the process above
 
+! Does the same thing, but to the process below as though it was from the process above
 CALL MPI_SENDRECV( a(1,s), nx, MPI_DOUBLE_PRECISION, nbrbottom, 1, a(1,e+1), nx, MPI_DOUBLE_PRECISION, &
                      nbrtop, 1, comm1d, MPI_STATUS_IGNORE, ierr)
 

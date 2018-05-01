@@ -6,7 +6,7 @@
 
 ! Begin module:
 MODULE jiterations
-use mpi
+use MPI
 ! Require explicit variable declaration and save for use
 IMPLICIT NONE
 SAVE
@@ -35,7 +35,7 @@ REAL(KIND=8), INTENT(IN) :: tol                             ! Relaxation toleran
 
 ! Local calculation variables
 INTEGER :: i, j, ierr                             ! Loop indices
-REAL(KIND=8) :: prefactor, dyterm, dxterm                  ! Hold temporary values in calculating elements
+REAL(KIND=8) :: prefactor, dyterm, dxterm, fterm  ! Hold temporary values in calculating elements
 
 
 
@@ -45,7 +45,8 @@ DO i=1, nx ! Exclude first and final row
     DO j=s, e ! Exclude ghost cells
         dxterm = (dy**2)*(a(i-1, j)+a(i+1, j))
         dyterm = (dx**2)*(a(i, j-1)+a(i, j+1))
-        b(i,j) = prefactor*((dyterm+dxterm) - f(i, j))
+        fterm = (dx**2 + dy**2)*f(i, j)
+        b(i,j) = prefactor*(dyterm + dxterm - fterm)
     END DO
 END DO
 CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
@@ -53,6 +54,9 @@ END SUBROUTINE j_sweep1d
 
 ! FUNCTIONS
 ! ======================
+
+! Loops over the given local a, b arrays and calculates the cumulative
+! squared distance, for error estimation in a specific process
 FUNCTION diff(nx, s, e, a, b) RESULT(sum)
 
 INTEGER :: nx, s, e
@@ -60,7 +64,7 @@ REAL(KIND=8) :: a(0:nx+1, s-1:e+1), b(0:nx+1, s-1:e+1)
 INTEGER :: i, j
 REAL(KIND=8) :: sum
 
-sum = 0.0d0
+sum = 0.0d0                     ! Initialize sum to zero
 DO i=1, nx
     DO j=s, e
         sum = sum + (a(i,j) - b(i,j))**2

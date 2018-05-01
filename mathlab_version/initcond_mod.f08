@@ -63,8 +63,10 @@ a = 50.0d0
 b = 50.0d0
 
 ! Source array
+! Care must be taken here: you must select the appropriate process
+! to place a source in, should you wish to do so
 f = 0.0d0
-f(NX/2, NY/2) = -10.0d0
+
 
 
 
@@ -87,7 +89,7 @@ IF (s == 1) THEN
 END IF
 
 
-DO j=s-1, e+1   ! Only from s to e because s-1 and e+1 are ghost zones from other processes
+DO j=s-1, e+1   ! Fix along the y edges to be boundary conditions
     ! LEFT BOUNDARY CONDITIONS (x=xmin, y): USER MAY EDIT TO SPECIFY PARTICULAR CONDITIONS
     a(0, j) = 0.0d0
     b(0, j) = 0.0d0

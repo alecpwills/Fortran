@@ -7,11 +7,10 @@
 
 ! Begin program:
 PROGRAM mpi_poisson
-
-USE MPI
-USE initcond
-USE mpi_funcs
-USE jiterations
+USE MPI                         ! The module for MPI commands
+USE initcond                    ! The module defining intitial conditions
+USE mpi_funcs                   ! The module defining the comm. subroutine
+USE jiterations                 ! The iteration module
 
 
 ! Require explicit variable declaration
@@ -28,13 +27,6 @@ INTEGER :: s, e
 REAL(KIND=8), ALLOCATABLE :: a(:, :), b(:, :), f(:, :)
 REAL(KIND=8) :: t1, t2, tdiff
 INTEGER :: status(MPI_STATUS_SIZE)
-INTEGER :: mpivect, fh
-
-! MPE RELATED VARIABLES
-! Not used on Mathlab submission
-!INTEGER :: pcd, mcd, pygd, mygd, ppgzone, mpgzone
-!INTEGER :: pisone, misone, ppgztwo, mpgztwo, pistwo, mistwo
-!INTEGER :: pac, mac
 
 
 ! Other variables
@@ -82,7 +74,6 @@ END IF
 
 ! Decompose current domain into different segments
 ! Separates in a Cartesian manner, isperiodic = .false., reorder = .true. to allow MPI to efficiently segment
-!ierr = MPE_LOG_EVENT(pcd, 1, "+CD")
 CALL MPI_CART_CREATE(MPI_COMM_WORLD, 1, (/ numprocs /), (/ .false. /), .true., comm1d, ierr)
 
 ! Each process gets its position in the newly created communicator, as well as its neighbors
@@ -109,13 +100,11 @@ ELSE
     WRITE(*,*) "Allocation of local arrays in process ", myid, " successful."
 END IF
 
-CALL MPI_BARRIER( MPI_COMM_WORLD, ierr)
 ! Initialize the boundary conditions in each process
 IF (myid == 0) WRITE(*,*) "Setting initial conditions in local arrays."
 CALL phi_init(NX, s, e, a, b, f)
 IF (myid == 0) WRITE(*,*) "Initial conditions set. Beginning iteration process."
 
-call MPI_BARRIER( MPI_COMM_WORLD, ierr )   ! Create a barrier -- all processes pause until all caught up to here
 t1 = MPI_WTIME()  ! Get time for the beginning of the loop
 
 ! Begin the iteration process
@@ -133,7 +122,7 @@ DO WHILE (.TRUE.)
     dwork = diff(NX, s, e, a, b) ! Calculate the total difference amongst elements of a and b
 
     ! Reduce the values of dwork into diffnorm, summing over them
-	CALL MPI_Allreduce(dwork, diffnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm1d, ierr)
+    CALL MPI_Allreduce(dwork, diffnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm1d, ierr)
     
     ! Have manager write out the process
     IF ((myid == 0).AND.(MOD(globaliter, 10) == 0))  THEN 
@@ -144,7 +133,7 @@ DO WHILE (.TRUE.)
     ! If the overall sum of the differences is less than the specified tolerance, assume relaxed solution
     IF (diffnorm < TOL) EXIT
 END DO
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
+
 ! Find time after completion to write out.
 t2 = MPI_WTIME()
 tdiff = t2-t1
@@ -154,11 +143,8 @@ IF (myid == 0) THEN
     WRITE(*,*) "Relaxation took ", tdiff, "seconds."
 END IF
 
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
-
 ! OUTPUT RESULTS TO PLOTTABLE FILE
 ! ================================
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
 IF (myid == 0) WRITE(*,*) "Allocating space for result array."
 IF (myid == 0) ALLOCATE(result(0:NX+1, 0:NY+1))
 IF (myid == 0) WRITE(*,*) "Concatenating results across processes..."
@@ -167,7 +153,7 @@ IF (myid == 0) THEN
     WRITE(*,*) "Copying manager local result array into final results."
     result(0:NX+1, s-1:e+1) = a(0:NX+1, s-1:e+1)
 END IF
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
+
 IF (myid == 0) WRITE(*,*) "Sending worker process arrays."
 
 IF (myid /= 0) THEN
@@ -189,8 +175,7 @@ IF (myid == 0) THEN
     IF (oLUN == -1) WRITE(*,*) "Error opening file."
 END IF
 
-IF (myid == 0) WRITE(*,*) ioerr
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
+
 IF (myid == 0) WRITE(*,*) "Writing coordinate-pair and potential file."
 IF (myid == 0) THEN
     DO i=0, NX+1
@@ -199,16 +184,12 @@ IF (myid == 0) THEN
        END DO
     END DO
 END IF
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
+
 IF (myid == 0) WRITE(*,*) "Finished writing results to output file."
 
 
 ! END PROGRAM
 ! ======================
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
-!!ierr = MPE_FINISH_LOG("log.log")
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
-
 IF (myid == 0) WRITE(*,*) "Deallocating f."
 DEALLOCATE(f)
 IF (myid == 0) WRITE(*,*) "Deallocating a."
@@ -218,16 +199,12 @@ DEALLOCATE(b)
 IF (myid == 0)  WRITE(*,*) "Deallocating result."
 IF (myid == 0 ) DEALLOCATE(result)
 
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
 IF (myid == 0) WRITE(*,*) "Closing write file."
 IF (myid == 0) THEN
     CLOSE(unit=oLUN)
 END IF
 
-CALL MPI_BARRIER(MPI_COMM_WORLD, ierr)
 IF (myid == 0) WRITE(*,*) "Finalizing MPI_Session."
-
-
 CALL MPI_FINALIZE(ierr)
 
 STOP 0
