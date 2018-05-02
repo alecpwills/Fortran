@@ -1,5 +1,22 @@
 \begin{thebibliography}{1}
 
+\bibitem{gromacs}
+{H. Berendsen, D. van der Spoel, R. van Drunen}.
+\newblock {GROMACS: A message-passing parallel molecular dynamics
+  implementation}.
+\newblock {\em Comp. Phys. Comm.}, 91:43--56, 1995.
+
+\bibitem{siesta}
+J.~Soler et~al.
+\newblock {The SIESTA method for ab initio order-N materials simulation}.
+\newblock {\em J. Phys. Cond. Matt.}, 14(11):2745--2779, Mar 2002.
+
+\bibitem{mpibook}
+{W. Gropp, E. Lusk, A. Skjellum}.
+\newblock {\em {Using MPI - Portable Parallel Programming with the
+  Message-Pasing Interface}}.
+\newblock MIT Press, 3 edition, 2014.
+
 \bibitem{intel}
 Intel\textsuperscript{\textregistered}.
 \newblock {Intel\textsuperscript{\textregistered} Core\textsuperscript{TM}
@@ -18,5 +35,10 @@ Intel\textsuperscript{\textregistered}.
 \newblock Online.
 \newblock
   \url{http://www.mcs.anl.gov/research/projects/perfvis/download/index.htm#MPE}.
+
+\bibitem{git}
+{Alec Wills}.
+\newblock Online.
+\newblock \url{https://github.com/alecpwills/Fortran/tree/master/project}.
 
 \end{thebibliography}

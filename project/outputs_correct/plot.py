@@ -122,14 +122,19 @@ cb = fig.colorbar(cax, orientation='horizontal', fraction=0.05)
 plt.tight_layout()
     
 #%%
+file = "three_bcs"
 dir_path = '/home/alec/Documents/Fortran/project'
-df = pd.read_table(os.path.join(dir_path, 'outputs_correct/p1_sourcen100.dat'), header=None, delim_whitespace=True)
+df = pd.read_table(os.path.join(dir_path, 'outputs_correct/{}.dat'.format(file)), header=None, delim_whitespace=True)
 f = plt.figure()
 ax = f.add_subplot(111)
 #h=plt.contour(xs, ys, z)
 cax = ax.hexbin(x=df.iloc[:, 0], y=df.iloc[:, 1], C=df.iloc[:, 2], cmap='inferno')
 cb = f.colorbar(cax)
+ax.set_ylabel('$y$ (cm)')
+ax.set_xlabel('$x$ (cm)')
 cb.set_label('$\phi(x,y)$ (V)')
+plt.tight_layout()
+plt.savefig('{}_heatmap.png'.format(file), dpi=800)
 plt.show()
 plt.close()
 
@@ -146,15 +151,17 @@ elif length < 50000:
 else:
     size = 0.01
 print(size)
-cax = ax.plot_trisurf(df.iloc[:, 0], df.iloc[:, 1], df.iloc[:, 2], cmap=cm.inferno,
-                      antialiased=False, linewidth=0)
+cax = ax.plot_trisurf(df.iloc[:, 0], df.iloc[:, 1], df.iloc[:, 2], cmap='inferno',
+                      antialiased=False, linewidth=1)
 ax.set_ylabel('$y$ (cm)')
 ax.set_xlabel('$x$ (cm)')
 ax.set_zlabel('$\phi(x,y)$ (V)')
 #ax.set_autoscalez_on(True)
-ax.set_zlim(0, 100)
+ax.set_zlim(-100, 100)
+ax.set_ylim(15, 0)
 cb = fig.colorbar(cax, orientation='horizontal', fraction=0.05)
 plt.tight_layout()
+plt.savefig('{}_graph.png'.format(file), dpi=800)
 plt.show()
 plt.close()
 #%%
@@ -208,16 +215,32 @@ for chunk in df:
     plt.savefig(os.path.join(dir_path, 'outputs_correct/graphpngs/graph_{:04d}'.format(i)))
     plt.close()
 #%%
-pngpath = os.path.join(dir_path, 'outputs_correct/graphpngs/')
-filenames = sorted(os.listdir(os.path.join(dir_path, 'outputs_correct/graphpngs/')))
-images = []
-for file in filenames[:-1]:
-    images.append(imageio.imread(os.path.join(pngpath, file)))
-imageio.mimsave(os.path.join(dir_path, 'graph.gif'), images, duration=1)
+#pngpath = os.path.join(dir_path, 'outputs_correct/graphpngs/')
+#filenames = sorted(os.listdir(os.path.join(dir_path, 'outputs_correct/graphpngs/')))
+#images = []
+#for file in filenames[:-1]:
+#    images.append(imageio.imread(os.path.join(pngpath, file)))
+#imageio.mimsave(os.path.join(dir_path, 'graph.gif'), images, duration=1)
+##%%
+#pngpath = os.path.join(dir_path, 'outputs_correct/pngs/')
+#filenames = sorted(os.listdir(os.path.join(dir_path, 'outputs_correct/pngs/')))
+#images = []
+#for file in filenames[:-1]:
+#    images.append(imageio.imread(os.path.join(pngpath, file)))
+#imageio.mimsave(os.path.join(dir_path, 'heatmap.gif'), images, duration=0.03)
+
+
 #%%
-pngpath = os.path.join(dir_path, 'outputs_correct/pngs/')
-filenames = sorted(os.listdir(os.path.join(dir_path, 'outputs_correct/pngs/')))
-images = []
-for file in filenames[:-1]:
-    images.append(imageio.imread(os.path.join(pngpath, file)))
-imageio.mimsave(os.path.join(dir_path, 'heatmap.gif'), images, duration=0.03)
+dir_path = '/home/alec/Documents/Fortran/project'
+df = pd.read_table(os.path.join(dir_path, 'diffmat.dat'), header=None, delim_whitespace=True)
+f = plt.figure()
+ax = f.add_subplot(111)
+cax = ax.hexbin(x=df.iloc[:, 0], y=df.iloc[:, 1], C=df.iloc[:, 2], cmap='inferno')
+cb = f.colorbar(cax)
+ax.set_ylabel('$y$ (cm)')
+ax.set_xlabel('$x$ (cm)')
+cb.set_label('$\phi(x,y)$ (V)')
+plt.tight_layout()
+plt.savefig('{}_heatmap.png'.format(file), dpi=800)
+plt.show()
+plt.close()

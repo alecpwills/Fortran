@@ -4,7 +4,7 @@
 \usepackage{dcolumn}
 \usepackage{bm}
 \usepackage{float}
-\usepackage{caption}
+\usepackage[font=small,labelfont=bf]{caption}
 \captionsetup{justification=raggedright,
 	singlelinecheck=false}
 \usepackage{listings}
@@ -18,6 +18,7 @@
 \hypersetup{colorlinks=true, allcolors=blue}
 \def\inline{\lstinline[basicstyle=\ttfamily,keywordstyle={}]}
 
+\newcommand{\bv}[1]{\mathbf{#1}}
 
 
 
@@ -31,18 +32,39 @@
 \date{May 4, 2018}
 
 \begin{abstract}
-	We investigate  parallel processing in numerically solving the Poisson equation in two dimensions. A mesh of points defining the domain of $\mathbb{R}^2$ in which we solve the equation is decomposed along one dimension and sent to different processes. These processes then relax their subdomain via Jacobi iteration and communicate results with processes carrying neighbor subdomains, so that further relaxation may occur. When relaxation yields a total error of no more than $10^{-6}$, the 
+	We investigate  parallel processing in numerically solving the Poisson equation in two dimensions. A mesh of points defining the domain of $\mathbb{R}^2$ in which we solve the equation is decomposed along one dimension and sent to different processes. These processes then relax their subdomain via Jacobi iteration and communicate results with processes carrying neighbor subdomains, so that further relaxation may occur. When relaxation yields a total error of no more than $10^{-6}$, the ASKDJOAIJWDAOKWNDOA BFOIKAWDPOAK WMDNOAIFKDLMA,;LDAK S WRITE MORE
 \end{abstract}
 
 \maketitle
 
-\section{Introduction \& Motivation}
+\section{Introduction}
 
-Computational studies of intractable problems are becoming increasingly popular (and important) in gleaning information about the system in question. In an ever increasingly technological world, efficiency at analyzing and computing data is a key factor in the success of many fields of research as well as in general industry. For this reason, an investigation into parallel computing becomes essential in learning the basic techniques being employed by cutting edge institutions in their work with large amounts of information.
+\subsection{Motivation}
+
+Computational studies of intractable problems are becoming increasingly popular (and important) in gleaning information about the system in question. In an ever increasingly technological world, efficiency at analyzing and computing data is a key factor in the success of many fields of research as well as in general industry. For this reason, an investigation into parallel computing becomes essential in learning the basic techniques being employed by cutting edge institutions in their work with large amounts of information. In particular, almost all available molecular dynamics simulation programs (quantum or classical) necessitate the use of parallelizing their execution, given the massive number of coordinates to keep track of ($3N$ for $N$ particles and all you care about is position) and interaction terms (on the order of $N^2$ for only pairwise interactions). Many programs offer hybridized parallel processing capabilities, such as the classical simulations in GROMACS \cite{gromacs}, while others focus primarily on a single type of parallelizing, such as the quantum simulations of SIESTA \cite{siesta}.
+
+\subsection{Parallel Computation}
+
+As a brief introduction, we describe the general concepts involved in parallel computation, as well as justify why we chose our particular parallelization scheme in this project.
+
+As an example, we consider two vectors $\bv{a}$ and $\bv{b}$ in $\mathbb{R}^n$. When computing the dot product $$c = \bv{a}\cdot\bv{b}=\sum_i^n a_ib_i,$$ one needn't compute the product in any particular order. Going from $i=1$ to $i=n$ in sequential order is no different than choosing a random $i$ out of remaining products, and then summing them at the end. In this sense, the dot product is very much \textit{parallelizable}, in that anybody could compute a product in the sum without needing to know any other product. At the end, the results would be communicated back together to form the sum. In a computational sense, instead of computing the dot product in order by one process many different processes could be executed, each computing a separate product and drastically reducing computation time. In this particular example, we perform the same instruction on multiple data points, and thus this falls under the Single-Instruction-Multiple-Data (SIMD) umbrella of parallel computation. Other categories exist, involving varying amounts of instructions and data, but the concept remains the same -- one breaks up a parallelizable process into independent processes and combines whatever result at the end.
+
+
+\begin{figure}[H]
+\includegraphics[scale=0.5]{parallel.png}
+\captionof{figure}{An example of a hybrid model of parallel processing, wherein the separate memory spaces (rectangles) have subprocesses (circles) that share the space, while communication over a network (gray blob) between the separate memory spaces doesn't allow universal access to the data being worked on. Reprinted from \cite{mpibook}.}
+\label{pic}
+\end{figure}
+
+Within these umbrellas of instruction-data categories, one may further specify whether a parallel computation is through \textit{shared memory} or processes work on their own memory spaces without access to the global range of data. A diagram depicts this concept in Fig. \ref{pic}. In our example, a shared memory implementation of the dot product might compute the sums across subprocesses but add the answer to a globally available sum.
+
+An alternative scheme, and the one used in this work, is called the \textit{message-passing} model. In this regime, memory spaces are not global. Subprocesses only have access to a determined subregion of the data, for instance indices $j$ to $k$ in our example. Here, communication must occur between the different memory spaces and the corresponding subprocesses so that other spaces are aware of what has happened, if needed. In our example, the subset of indices available to a given memory space could be summed, and then the partial sum communicated back to some managing process to form the total sum in the dot product. This concept is also depicted in Fig. \ref{pic}.
+
+Given the customizability of the message-passing model (in how the data is subdivided), and the protection of subdomains of data, we utilize the message-passing model in our work. In particular, we use the MPICH implementation of the interface. Particular versions and compilation environments are detailed in the Methods section.
 
 
 
-\section{Theory/Other Title}
+\section{Theory}
 
 \subsection{An Analytical Solution}
 
@@ -54,7 +76,7 @@ We here put forth an analytical solution to the sourceless Poisson equation \beg
 \phi(0, y) &= 0 \\
 \phi(a, y) &= 0\\
 \phi(x, 0) &= 0\\
-\phi(x, b) &= f(x)
+\phi(x, b) &= f(x) \label{bcs}
 \end{aligned}
 \end{equation} where the upper border's boundary condition will remain arbitrary until we specify its form. Since Eq. \ref{sourceless} is linear and homogeneous, we assume that $phi(x,y)$ is separable such that \begin{equation} \phi(x,y)=X(x)Y(y). \label{separable} \end{equation} Now using this form of $\phi(x,y)$ and plugging into the Eq. \ref{sourceless} yields two decoupled ordinary differential equations \begin{equation}
 \frac{X''(x)}{X(x)} = -\frac{Y''(y)}{Y(y)} = - \lambda, \label{separated}
@@ -85,9 +107,64 @@ c_n =& \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)}\times\biggl[\frac{-5a}{n^2\
 &+(a-20)n\pi\cos(n\pi)-a\sin(n\pi)\biggr)\biggr].
 \label{finalceq}
 \end{aligned}
-\end{equation} Thus we have found an analytical solution solving the Poisson equation with the specified boundary potential.
+\end{equation} Thus we have found an analytical solution solving the Poisson equation with the specified boundary potential. This solution is shown in Fig. \ref{analytical}.
+
+\begin{figure}[H]
+	\hspace{-1cm}
+	\includegraphics[scale=0.7]{analytical.png}
+	\captionof{figure}{The analytical solution to the Poisson equation with the boundary conditions of this section, summed over 500 terms. Qualitatively, one can see it fits the expected boundary conditions with slight deviations near the $x$ limits.}
+	\label{analytical}
+\end{figure}
 
 Implementations of nonzero boundary terms are, of course, possible for the other sides of the region, and the above analysis extends to each side so long as the boundary conditions are linear. One may use the superposition principle to construct an arbitrary solution to boundary potentials at each side so long as the series functions are constructed individually -- that is, for each solution you can only assume one side is nonzero.
+
+\subsection{A Numerical Solution}
+
+We examine the equation \begin{equation}
+\nabla^2\phi(x,y)=f(x,y) \label{sourceeq}
+\end{equation} and seek a solution for $\phi(x,y)$.
+In doing so, along the same Cartesian region $[0,a]\times [0,b]$ as above, we discretize the domain into a mesh. We do not specify the mesh size until later, going from a general case to our specific considerations.
+
+In order to discretize the Laplacian of our potential, on our mesh we consider a point $\phi_{ij}$, using the notation $$\phi_{ij}=\phi(x_i,y_j).$$ We Taylor expand our function one $x$-point behind $\phi_{ij}$ while keeping $y$ fixed: \begin{equation}
+\begin{aligned}
+\phi_{i-1,j} =&\ \phi_{ij} + \partial_x \phi_{ij}(x_i-x_{i-1})\\&+\frac{1}{2}\partial_{xx}\phi_{ij}(x_i-x_{i-1})^2, \label{taylor}
+\end{aligned}
+\end{equation} where we neglect cubic order terms, assuming our mesh is fine enough. We can carry out the same expansion but at the point ahead of our $x$, yielding an analogous solution with $x_{i-1}\to x_{i+1}$. We here define \begin{equation}
+\begin{aligned}
+\Delta x_- &= x_i-x_{i-1}\\
+\Delta x_+ &= x_i-x_{i+1} \label{deltaeq}
+\end{aligned}
+\end{equation} for notation simplification. We can solve these two equations for $\partial_{xx}\phi_{ij}$ in terms of $\phi_{ij}$ and $\partial_x\phi_{ij}$ by adding Eq. \eqref{taylor} and the expansion for $\phi_{i+1,j}$ to yield \begin{equation}
+\begin{aligned}
+\partial_{xx}\phi_{ij} &= \frac{2}{\Delta x_-^2+\Delta x_+^2}\biggl[\phi_{i-1,j}+\phi_{i+1,j}-2\phi_{ij}\\&-\partial_x\phi_{ij}(\Delta x_-+\Delta x_+)\biggr], \label{xxeq}
+\end{aligned}
+\end{equation} where we have everything in terms of the mesh grid except for the first order derivative. But we can solve for this in terms of the grid values as well, again expanding ahead or behind of the given grid point to find \begin{equation}
+\partial_x\phi_{ij}=\frac{\phi_{i+1,j}-\phi_{i-1,j}}{\Delta x_+ - \Delta x_-} \label{ptlxeq}
+\end{equation} which we may use to plug into Eq. \eqref{xxeq} to solve for the second derivative solely in terms of the grid point and its neighbors. We again introduce notation, letting \begin{equation}
+\begin{aligned}
+\alpha_x &= \Delta x_++\Delta x_-\\
+\beta_x &= \Delta x_+-\Delta x_-\\
+\gamma_x^2 &= \Delta x_+^2+\Delta x_-^2 \label{params}
+\end{aligned}
+\end{equation} to further simplify equations.
+
+Carrying forth the exact same analysis but with $x\to y$ and analogous definitions will finally yield a numerical form of Eq. \eqref{sourceeq}: \begin{widetext}
+	\begin{equation}
+	\frac{2}{\gamma_x^2}\left[\phi_{i-1,j}+\phi_{i+1,j} - 2\phi_{ij} - \left(\phi_{i+1,j}-\phi_{i-1,j}\right)\frac{\alpha_x}{\beta_x}\right] + \frac{2}{\gamma_y^2}\left[\phi_{i,j-1}+\phi_{i,j+1} - 2\phi_{ij} - \left(\phi_{i,j+1}-\phi_{i,j-1}\right)\frac{\alpha_y}{\beta_y}\right] = f_{ij} \label{numsourceeq}
+	\end{equation}
+	\end{widetext} where we have thus far allowed for an arbitrary spacing between the forward and backward points in each dimension.
+
+We now consider the case where the grid is evenly spaced in its dimensions, i.e. $\Delta x_-=\Delta x_+ = \Delta x$ and similarly for $\Delta y$ (but the spacings need not be equal to each other in our case). Then, by construction $\Delta x_+=-\Delta x$ and $\Delta y_+=-\Delta y$. These assumptions yield vanishing $\alpha_x$ and $\alpha_y$ terms, whereas $\beta_x=2\Delta x$ and $\gamma_x^2 = 2\Delta x^2$. Similar definitions hold for the $y$ terms. 
+
+Noting that we can solve for $\phi_{ij}$ as a function of its neighboring points and the source at that point, we will be able to iteratively solve the final equation \begin{widetext}
+\begin{equation}
+\phi_{ij} = \frac{\Delta y^2(\phi_{i-1, j} + \phi_{i+1,j}) + \Delta x^2(\phi_{i, j-1}+\phi_{i, j+1}) - (\Delta x^2+\Delta y^2)f_{ij}}{2(\Delta x^2+\Delta y^2)} \label{jitereq}
+\end{equation}
+\end{widetext} through successive iterations until a result of desired accuracy is achieved.
+
+One may implement arbitrary boundary conditions here, so long as the changing iteration regions are chosen carefully and exclude the fixed borders. Sources may be defined as well, so the solution is a general numerical solution to the arbitrary potential problem.
+
+
 
 \section{Methods}
 
@@ -99,11 +176,60 @@ Some simulations were run on Stony Brook University's Mathlab machines as the ne
 
 Plots were generated using Python 3.6.5, with the \inline{matplotlib} 2.2.2 package, and most notably its subpackage \inline{pyplot}. Some analytical work was also done using Mathematica 11.2.
 
+\subsection{Simulations and Data Reduction}
+
+All simulations were run using the boundary conditions of Eqs. \eqref{bcs}, using an upper boundary function as given in Eq. \eqref{fofx}. Half of the simulations were run with a source in the center of the mesh grid. The error tolerance between iterations for all simulations was $\epsilon=10^{-6}$ V, whereupon the mesh was considered relaxed after the error dropped below the tolerance. In each case (source and no source), tests were run with one through four processors on the workstation, while a benchmark test was done on the Mathlab machine using eight processors. Source code is available as listed in \cite{git}. Although the resulting output files were too large in size to upload, they are available upon request.
+
+The final result of the iteration was output to a \inline{.dat} file, which was read into and plot in Python, resulting in the figures printed in this report. The analytical solution was created in Mathematica, as the interactive math environment was more suited to the task without importing different modules as would be necessary in Python. The MPE implementation outputs a \inline{.clog2} file, which is converted into a \inline{.slog2} format for visualizing the processing times.
+
+\section{Analysis and Results}
+
+As the relaxation method did not yield different answers for different processor numbers, we only show the forms of the sourceless and sourced relaxed solution here, and a typical example of the output MPE logfiles as well. Remaining logfile graphics can be seen in Appendix C.
+
+\subsection{Relaxation Accuracy}
+
+We here compare our sourceless relaxed solutions to the analytical form found in the Theory section. A heatmap of our result can be seen in Fig. \ref{heatmapnosource}, while a surface plot of the relaxed solution can be seen in Fig. \ref{graphnosource}.
+
+\begin{figure}
+	\includegraphics[scale=0.5]{four_bc_heatmap.png}
+	\captionof{figure}{A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.}
+	\label{heatmapnosource}
+\end{figure}
+
+We compare the relaxed grid values from out potential mesh with those in Eq. \eqref{phisum}, using the substituted coefficients in Eq. \eqref{finalceq} summed to 500 terms. The maximum error value in taking the difference of these numerical and analytical solutions is $\sim 213$ volts, occurring at the edges of the boundary condition. The large error in the corners is explained by the summation error in the analytical solution -- had we summed to a larger number of terms the analytical solution would have converged closer to the limits of the $x$-axis. 
+\begin{figure}[H]
+	\includegraphics[scale=0.5]{four_bc_graph.png}
+	\captionof{figure}{The surface plot of our relaxed potential, solving the specified boundary condition.}
+	\label{graphnosource}
+\end{figure}
+Up to the 500 terms we did, however, there is a small range of about $0.5$ cm from each border along the upper boundary where the potential sharply declines to zero to meet the left and right boundary conditions prematurely. It is in these regions that our error is prevalent. We note that taking the mean error across the difference region is a better statistic for accuracy of the relaxed result. We here quote the means and standard deviations in the errors of three different regions, excluding some $y$ value regions to demonstrate that the error is almost exclusively along the boundary $(x, y=15)$, indicated by the large drop in standard deviation of error values.
+\begin{table}
+	\centering
+\begin{tabular}{|c|c|c|}
+	\hline
+	Statistic Region & Mean (V) & $\sigma$ (V)  \\ \hline
+	$y\in[0,15]$ & $-0.128$ & $2.727$ \\ \hline
+	$y\in[0, 14]$ & $-0.118$ & $0.319$ \\ \hline
+	$y\in[0, 13]$ & $-0.110$ & $0.241$  \\ \hline
+\end{tabular}
+\end{table}
+
+A surface plot of the error is shown in Fig. \ref{diffmat}, further justifying the conclusion that the convergence of the analytical solution towards the corners of the region is the main source of error.
+
+\begin{figure}[H]
+	\includegraphics[scale=0.5]{diffmat_graph.png}
+	\captionof{figure}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.}
+	\label{diffmat}
+\end{figure}
 
 
-\appendix{Appendix A. Fourier Orthogonality}
+\section{Appendices}
 
-\appendix{Appendix B. Coefficient Determination}
+\appendix{\bf Appendix A -- Fourier Orthogonality.}
+
+\appendix{\bf Appendix B -- Coefficient Determination.}
+
+\appendix{\bf Appendix C -- Simulation Figures.}
 
 
 \bibliographystyle{unsrt}%Used BibTeX style is unsrt
