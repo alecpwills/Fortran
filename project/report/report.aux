@@ -20,14 +20,14 @@
 \citation{siesta}
 \citation{mpibook}
 \newlabel{FirstPage}{{}{1}{}{section*.1}{}}
-\@writefile{toc}{\contentsline {title}{A Parallel Computational Investigation of Poisson's Equation}{1}{section*.2}}
+\@writefile{toc}{\contentsline {title}{A Parallel Computational Investigation\@centercr  of Poisson's Equation}{1}{section*.2}}
 \@writefile{toc}{\contentsline {abstract}{Abstract}{1}{section*.1}}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section*.3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A}Motivation}{1}{section*.4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B}Parallel Computation}{1}{section*.5}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces An example of a hybrid model of parallel processing, wherein the separate memory spaces (rectangles) have subprocesses (circles) that share the space, while communication over a network (gray blob) between the separate memory spaces doesn't allow universal access to the data being worked on. Reprinted from \cite  {mpibook}.\relax }}{1}{figure.caption.6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces An example of a hybrid model of parallel processing, wherein the separate memory spaces (rectangles) have subprocesses (circles) that share the space, while communication over a network (gray blob) between the separate memory spaces doesn't allow universal access to the data being worked on. Reprinted from \cite  {mpibook}.\relax }}{2}{figure.caption.6}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{pic}{{1}{1}{An example of a hybrid model of parallel processing, wherein the separate memory spaces (rectangles) have subprocesses (circles) that share the space, while communication over a network (gray blob) between the separate memory spaces doesn't allow universal access to the data being worked on. Reprinted from \cite {mpibook}.\relax }{figure.caption.6}{}}
+\newlabel{pic}{{1}{2}{An example of a hybrid model of parallel processing, wherein the separate memory spaces (rectangles) have subprocesses (circles) that share the space, while communication over a network (gray blob) between the separate memory spaces doesn't allow universal access to the data being worked on. Reprinted from \cite {mpibook}.\relax }{figure.caption.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {II}Theory}{2}{section*.7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A}An Analytical Solution}{2}{section*.8}}
 \newlabel{sourceless}{{1}{2}{}{equation.2.1}{}}
@@ -39,9 +39,9 @@
 \newlabel{yeq}{{7}{2}{}{equation.2.7}{}}
 \newlabel{phisum}{{8}{2}{}{equation.2.8}{}}
 \newlabel{feq}{{9}{2}{}{equation.2.9}{}}
-\newlabel{constant}{{11}{2}{}{equation.2.11}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The analytical solution to the Poisson equation with the boundary conditions of this section, summed over 500 terms. Qualitatively, one can see it fits the expected boundary conditions with slight deviations near the $x$ limits.\relax }}{3}{figure.caption.9}}
 \newlabel{analytical}{{2}{3}{The analytical solution to the Poisson equation with the boundary conditions of this section, summed over 500 terms. Qualitatively, one can see it fits the expected boundary conditions with slight deviations near the $x$ limits.\relax }{figure.caption.9}{}}
+\newlabel{constant}{{11}{3}{}{equation.2.11}{}}
 \newlabel{fofx}{{12}{3}{}{equation.2.12}{}}
 \newlabel{finalceq}{{13}{3}{}{equation.2.13}{}}
 \newlabel{pointv}{{14}{3}{}{equation.2.14}{}}
@@ -65,22 +65,22 @@
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Analysis and Results}{4}{section*.14}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.\relax }}{5}{figure.caption.16}}
 \newlabel{heatmapnosource}{{3}{5}{A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.\relax }{figure.caption.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {A}Relaxation Accuracy}{5}{section*.15}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The surface plot of our relaxed potential, solving the specified boundary condition.\relax }}{5}{figure.caption.17}}
 \newlabel{graphnosource}{{4}{5}{The surface plot of our relaxed potential, solving the specified boundary condition.\relax }{figure.caption.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A}Relaxation Accuracy}{5}{section*.15}}
 \@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Statistical values referenced in the body of this section. Note the sharp decrease by an order of magnitude in $\sigma $ once we step away from the border of the boundary condition, where the convergence in the corners causes a large amount of error.\relax }}{5}{table.caption.18}}
 \newlabel{tab:stats}{{I}{5}{Statistical values referenced in the body of this section. Note the sharp decrease by an order of magnitude in $\sigma $ once we step away from the border of the boundary condition, where the convergence in the corners causes a large amount of error.\relax }{table.caption.18}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B}Timing}{5}{section*.20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }}{5}{figure.caption.19}}
+\newlabel{diffmat}{{5}{5}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }{figure.caption.19}{}}
 \citation{mpibook}
 \citation{mpibook}
 \citation{mpibook}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }}{6}{figure.caption.19}}
-\newlabel{diffmat}{{5}{6}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }{figure.caption.19}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Relaxation times for simulations run on the main workstation. It appears as though increasing beyond one processor does not increase simulation efficiency by very much.\relax }}{6}{table.caption.21}}
 \newlabel{tab:times}{{II}{6}{Relaxation times for simulations run on the main workstation. It appears as though increasing beyond one processor does not increase simulation efficiency by very much.\relax }{table.caption.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B}Timing}{6}{section*.20}}
+\newlabel{tceq}{{23}{6}{}{equation.4.23}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces A typical output of the \lstinline [basicstyle=\ttfamily  ,keywordstyle={}]{jumpshot} program using the MPE \lstinline [basicstyle=\ttfamily  ,keywordstyle={}]{.slog2} logfile. Here, the blue and purple bars are the two iterative sweeps in the main program loop. The white and green bars are the ghost zone communication after the sweeps. Not visible at this scale are the instantiation processes of the Cartesian process domain, and other one-time events.\relax }}{6}{figure.caption.22}}
 \newlabel{mpe4}{{6}{6}{A typical output of the \inline {jumpshot} program using the MPE \inline {.slog2} logfile. Here, the blue and purple bars are the two iterative sweeps in the main program loop. The white and green bars are the ghost zone communication after the sweeps. Not visible at this scale are the instantiation processes of the Cartesian process domain, and other one-time events.\relax }{figure.caption.22}{}}
-\newlabel{tceq}{{23}{6}{}{equation.4.23}{}}
 \newlabel{eff}{{24}{6}{}{equation.4.24}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{6}{section*.23}}
 \bibdata{reportNotes,refs}
@@ -91,12 +91,13 @@
 \bibcite{mpich}{{5}{}{{}}{{}}}
 \bibcite{mpe}{{6}{}{{}}{{}}}
 \bibcite{git}{{7}{}{{}}{{}}}
-\bibstyle{unsrt}
-\providecommand\NAT@force@numbers{}\NAT@force@numbers
 \@writefile{toc}{\appendix }
 \@writefile{toc}{\contentsline {section}{\numberline {A}Fourier Orthogonality}{7}{section*.24}}
 \@writefile{toc}{\contentsline {section}{\numberline {B}Coefficient Determination}{7}{section*.25}}
-\@writefile{toc}{\contentsline {section}{\numberline {C}Simulation Figures}{7}{section*.26}}
-\@writefile{toc}{\contentsline {section}{\numberline {}References}{7}{section*.28}}
-\newlabel{LastBibItem}{{7}{7}{}{section*.28}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {}References}{7}{section*.26}}
+\newlabel{LastBibItem}{{7}{7}{}{section*.26}{}}
+\bibstyle{unsrt}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces The figures from the remaining simulations. (a) A heatmap of the relaxed solution to the point source problem, where the center has a source creating a voltage point of $100$ V. (b) The surface plot for the heatmap. (c) The error surface plot substracting the relaxed solution's grid from the analytical solution. Note the more intense singularity in the analytical form, evident from the high error at the source point. (d) A zoomed in diagram showing step-by-step process work in a loop of the program. The white arrows indicate the communication of ghost zones between neighbor processes, and the purple and blue blocks are iterative steps.\relax }}{8}{table.caption.27}}
+\newlabel{simfigs}{{III}{8}{The figures from the remaining simulations. (a) A heatmap of the relaxed solution to the point source problem, where the center has a source creating a voltage point of $100$ V. (b) The surface plot for the heatmap. (c) The error surface plot substracting the relaxed solution's grid from the analytical solution. Note the more intense singularity in the analytical form, evident from the high error at the source point. (d) A zoomed in diagram showing step-by-step process work in a loop of the program. The white arrows indicate the communication of ghost zones between neighbor processes, and the purple and blue blocks are iterative steps.\relax }{table.caption.27}{}}
 \newlabel{LastPage}{{}{8}{}{}{}}

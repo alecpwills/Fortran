@@ -27,7 +27,7 @@
 
 \begin{document}
 
-\title{A Parallel Computational Investigation of Poisson's Equation}
+\title{A Parallel Computational Investigation\\of Poisson's Equation}
 
 \author{Alec Wills}
 \email{alec.wills@stonybrook.edu}
@@ -35,7 +35,7 @@
 \date{May 4, 2018}
 
 \begin{abstract}
-	We investigate  parallel processing in numerically solving the Poisson equation in two dimensions. A mesh of points defining the domain of $\mathbb{R}^2$ in which we solve the equation is decomposed along one dimension and sent to different processes. These processes then relax their subdomain via Jacobi iteration and communicate results with processes carrying neighbor subdomains, so that further relaxation may occur. When relaxation yields a total error of no more than $10^{-6}$, the ASKDJOAIJWDAOKWNDOA BFOIKAWDPOAK WMDNOAIFKDLMA,;LDAK S WRITE MORE
+	We investigate  parallel processing in numerically solving the Poisson equation in two dimensions. A mesh of points defining the domain of $\mathbb{R}^2$ in which we solve the equation is decomposed along one dimension and sent to different processes. These processes then relax their subdomain via Jacobi iteration and communicate results with processes carrying neighbor subdomains, so that further relaxation may occur. When relaxation yields a total error of no more than $10^{-6}$, simulation terminates and we characterize the accuracy of the numerical solution compared to the analytical, as well as investigate the timing of using multiple processes. We find that increasing the number of processes from one to multiple increases the simulation speed, but increasing beyond two does not change the simulation time by an appreciable amount.
 \end{abstract}
 
 \maketitle
@@ -106,8 +106,7 @@ The boundary condition $f(x)$ above is completely arbitrary, but at this point o
 f(x)=5x-100 \label{fofx}
 \end{equation} and state the final result for the coefficient formula, referring the reader to Appendix B for the derivation: \begin{equation}
 \begin{aligned}
-c_n =& \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)}\times\biggl[\frac{-5a}{n^2\pi^2}\biggl(20n\pi\\
-&+(a-20)n\pi\cos(n\pi)-a\sin(n\pi)\biggr)\biggr].
+c_n =& \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)}\\& \times\frac{-5a}{n\pi}\left[(a-20)\cos(n\pi)+20\right]
 \label{finalceq}
 \end{aligned}
 \end{equation} Thus we have found an analytical solution solving the Poisson equation with the specified boundary potential. This solution is shown in Fig. \ref{analytical}.
@@ -189,14 +188,14 @@ The final result of the iteration was output to a \inline{.dat} file, which was 
 
 \section{Analysis and Results}
 
-As the relaxation method did not yield different answers for different processor numbers, we only show the forms of the sourceless and sourced relaxed solution here, and a typical example of the output MPE logfiles as well. Remaining logfile graphics can be seen in Appendix C.
+As the relaxation method did not yield different answers for different processor numbers, we only show the forms of the sourceless and sourced relaxed solution here, and a typical example of the output MPE logfiles as well. Remaining logfile graphics can be seen in at the end of the document.
 
 \subsection{Relaxation Accuracy}
 
 We here compare our sourceless relaxed solutions to the analytical form found in the Theory section. A heatmap of our result can be seen in Fig. \ref{heatmapnosource}, while a surface plot of the relaxed solution can be seen in Fig. \ref{graphnosource}. GIFs of the relaxation process (both the heatmap and surface plot visualizations) are available in provided GitHub repository \cite{git}.
 
 \begin{figure}
-	\includegraphics[scale=0.5]{four_bc_heatmap.png}
+	\includegraphics[scale=0.5]{four_bc_heatmap.pdf}
 	\captionof{figure}{A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.}
 	\label{heatmapnosource}
 \end{figure}
@@ -205,7 +204,7 @@ We compare the relaxed grid values from out potential mesh with those in Eq. \eq
 
 
 \begin{figure}
-	\includegraphics[scale=0.5]{four_bc_graph.png}
+	\includegraphics[scale=0.5]{four_bc_graph.pdf}
 	\captionof{figure}{The surface plot of our relaxed potential, solving the specified boundary condition.}
 	\label{graphnosource}
 \end{figure}
@@ -230,13 +229,15 @@ Up to the 500 terms we did, however, there is a small range of about $0.5$ cm fr
 A surface plot of the error is shown in Fig. \ref{diffmat}, further justifying the conclusion that the convergence of the analytical solution towards the corners of the region is the main source of error.
 
 \begin{figure}
-	\includegraphics[scale=0.5]{diffmat_graph.png}
+	\includegraphics[scale=0.5]{diffmat_graph.pdf}
 	\captionof{figure}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.}
 	\label{diffmat}
 \end{figure}
 
 
-In the sourced solutions, $f(x,y)$ was set to be a point source at the middle of the grid with a strength of $ \frac{\rho}{\epsilon_0}=-100$ V. For sake of space, this heatmap and surface plot is shown in Appendix C, along with the appropriate error surface comparing the analytical solution to the relaxed grid. In it, one can see that the relaxed solution is much less singular at the point of the source. This intuitively makes sense, as the numerical solution of Eq. \eqref{jitereq} has no singularity at the point where we place the source, whereas the usual electrostatic potential Eq. \eqref{pointv} diverges as one approaches the source. Inherently, then, Jacobi iteration as used here will underestimate the potential near a small source. This is shown experimentally in our simulation by seeing the error is positive in the surface plot in Appendix C at the point source.
+In the sourced solutions, $f(x,y)$ was set to be a point source at the middle of the grid with a strength of $ \frac{\rho}{\epsilon_0}=-100$ V. For sake of space, this heatmap and surface plot is shown at the end of the report, along with the appropriate error surface comparing the analytical solution to the relaxed grid. In it, one can see that the relaxed solution is much less singular at the point of the source. This intuitively makes sense, as the numerical solution of Eq. \eqref{jitereq} has no singularity at the point where we place the source, whereas the usual electrostatic potential Eq. \eqref{pointv} diverges as one approaches the source. Inherently, then, Jacobi iteration as used here will underestimate the potential near a small source. This is shown experimentally in our simulation by seeing the error is positive in the surface plot in Tab. \ref{simfigs} at the point source.
+
+We further note that in all simulations, an initial potential of 50 V was applied to the grid, but this bias relaxes to zero due to the grounding of three of the sides.
 
 
 
@@ -294,36 +295,62 @@ Let \begin{equation}
 I = \int_{0}^a dx\cdot \sin\left(\frac{n\pi x}{a}\right)\sin\left(\frac{m\pi x}{a}\right).
 \end{equation} We use the identity \begin{equation}
 \sin(x)\sin(y)=\frac{1}{2}\left[\cos(x-y)-\cos(x+y)\right]
-\end{equation} to rewrite \begin{equation}
+\end{equation} to rewrite and integrate forward \begin{equation}
 \begin{aligned}
-I = \frac{1}{2}\int_0^a dx\cdot
+I &= \frac{a}{2}\biggl[\frac{1}{\pi(n-m)}\sin\left(\pi(n-m)\right)\\&-\frac{1}{\pi(n+m)}\sin\left(\pi(n+m)\right)\biggr].
 \end{aligned}
-\end{equation}
+\end{equation} Now, $\sin(k\pi)=0$ for all $k\in\mathbb{Z}$, so the second term vanishes without any issue (since we're considering $m,n>0$). The first term will also vanish for $n\neq m$, but we recall that \begin{equation}
+\lim\limits_{x\to 0} \frac{\sin(x)}{x} =1,
+\end{equation} so setting $n=m$ and letting $\pi(n-m)=x$ yields a nonvanishing first term, resulting in \begin{equation}
+I=\frac{a}{2} \delta_{nm},
+\end{equation} as required.
 
 \section{Coefficient Determination}
+We here want to solve the integral in Eq. \eqref{constant}, so we let \begin{equation}
+K = \int_0^a dx\cdot (5x-100)\sin\left(\frac{n\pi x}{a}\right).
+\end{equation} The second integral is straightforward: \begin{equation}
+-100\int_0^adx \cdot \sin\left(\frac{n\pi x}{a}\right) = 100\cdot \frac{a}{n\pi}\left[\cos(n\pi)-1\right].
+\end{equation}
 
+Solving the first integral by integration by parts, \begin{equation}
+\begin{aligned}
+5\int_0^a dx\cdot x\sin\left(\frac{n\pi x}{a}\right) &= 5\left[\frac{-a}{n\pi}x\cos\left(\frac{n\pi x}{a}\right)\right]_0^a \\ &- 5\int_0^a dx\cdot \sin\left(\frac{n\pi x}{a}\right).
+\end{aligned}
+\end{equation} 
 
+This evaluates to \begin{equation}
+\begin{aligned}
+5\int_0^a dx\cdot x\sin\left(\frac{n\pi x}{a}\right) &= \frac{-5a^2}{n\pi}\cos(n\pi),
+\end{aligned}
+\end{equation} since the final integral above results in zero.
 
-\Needspace{5\baselineskip}
-\section{Simulation Figures}
+We combine these results and factor out a $\frac{-5a}{n\pi}$ to find \begin{equation}
+K = \frac{-5a}{n\pi}\left[(a-20)\cos(n\pi)+20\right].
+\end{equation} Multiplying this by the prefactor derived in the text yields the coefficient result we use in our expansion.
 
-\begin{table}
-\begin{tabular}{cc}
-	\includegraphics[scale=0.5]{four_bcs_heatmap.png}
-&
-	\includegraphics[scale=0.5]{four_bcs_graph.png}\\ (a)&(b)\\
-
-	\includegraphics[scale=0.5]{ptdiff_graph.png} 
-	&
-	\includegraphics[scale=0.3]{msg.png} \\ (c)
-& (d)\\
-\end{tabular}
-\end{table}
 
 \bibliographystyle{unsrt}%Used BibTeX style is unsrt
 \bibliography{refs}
 
 
+\clearpage
+
+\begin{table*}[t]
+	{\large \sc Simulation Figures.}\\
+	\centering
+	\begin{tabular}{cc}
+		\includegraphics[scale=0.5]{four_bcs_heatmap.pdf}
+		&
+		\includegraphics[scale=0.5]{four_bcs_graph.pdf}\\ (a)&(b)\\
+		
+		\includegraphics[scale=0.5]{ptdiff_graph.pdf} 
+		&
+		\includegraphics[scale=0.3]{msg.png} \\ (c)
+		& (d)\\
+	\end{tabular}
+	\captionof{table}{The figures from the remaining simulations. (a) A heatmap of the relaxed solution to the point source problem, where the center has a source creating a voltage point of $100$ V. (b) The surface plot for the heatmap. (c) The error surface plot substracting the relaxed solution's grid from the analytical solution. Note the more intense singularity in the analytical form, evident from the high error at the source point. (d) A zoomed in diagram showing step-by-step process work in a loop of the program. The white arrows indicate the communication of ghost zones between neighbor processes, and the purple and blue blocks are iterative steps.}
+	\label{simfigs}
+\end{table*}
 
 
 

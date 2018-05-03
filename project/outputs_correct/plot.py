@@ -131,7 +131,7 @@ cb = fig.colorbar(cax, orientation='horizontal', fraction=0.05)
 plt.tight_layout()
     
 #%%
-file = "three_bcs"
+file = "four_bc"
 dir_path = '/home/alec/Documents/Fortran/project'
 df = pd.read_table(os.path.join(dir_path, 'outputs_correct/{}.dat'.format(file)), header=None, delim_whitespace=True)
 f = plt.figure()
@@ -143,7 +143,7 @@ ax.set_ylabel('$y$ (cm)')
 ax.set_xlabel('$x$ (cm)')
 cb.set_label('$\phi(x,y)$ (V)')
 plt.tight_layout()
-plt.savefig('{}_heatmap.png'.format(file), dpi=800)
+plt.savefig(os.path.join(dir_path, 'report/{}_heatmap.pdf'.format(file)), dpi=800)
 plt.show()
 plt.close()
 
@@ -170,7 +170,7 @@ ax.set_zlim(-100, 100)
 ax.set_ylim(15, 0)
 cb = fig.colorbar(cax, orientation='horizontal', fraction=0.05)
 plt.tight_layout()
-plt.savefig('{}_graph.png'.format(file), dpi=800)
+plt.savefig(os.path.join(dir_path, 'report/{}_graph.pdf'.format(file)), dpi=800)
 plt.show()
 plt.close()
 #%%
@@ -310,20 +310,20 @@ pt = pd.DataFrame(lsts, columns=['x', 'y', 'z'])
 diffs = np.array(abc.iloc[:, 2]) + np.array(pt.iloc[:, 2])-np.array(sol.iloc[:, 2])
 f = plt.figure()
 ax = f.add_subplot(111)
-cax = ax.hexbin(x=sol.iloc[:, 0], y=sol.iloc[:, 1], C=diffs, cmap='inferno')
+cax = ax.hexbin(x=diffmat.iloc[:, 0], y=diffmat.iloc[:, 1], C=diffmat.iloc[:, 2], cmap='inferno')
 cb = f.colorbar(cax)
 ax.set_ylabel('$y$ (cm)')
 ax.set_xlabel('$x$ (cm)')
 cb.set_label('$\Delta\phi(x,y)$ (V)')
 plt.tight_layout()
-plt.savefig('ptdiff_heat.png', dpi=800)
+#plt.savefig('ptdiff_heat.png', dpi=800)
 plt.show()
 plt.close()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 cols = np.linspace(min(diffs), max(diffs), num=len(diffs))
-length = len(df.iloc[:, 2])
+length = len(pt.iloc[:, 2])
 if length < 1000:
     size = 10
 elif length < 10000:
@@ -333,7 +333,7 @@ elif length < 50000:
 else:
     size = 0.01
 print(size)
-cax = ax.plot_trisurf(sol.iloc[:, 0], sol.iloc[:, 1], diffs, cmap='inferno',
+cax = ax.plot_trisurf(diffmat.iloc[:, 0], diffmat.iloc[:, 1], diffmat.iloc[:, 2], cmap='inferno',
                       antialiased=False, linewidth=1)
 ax.set_ylabel('$y$ (cm)')
 ax.set_xlabel('$x$ (cm)')
@@ -343,6 +343,6 @@ ax.set_zlim(-200, 200)
 ax.set_ylim(15, 0)
 cb = fig.colorbar(cax, orientation='horizontal', fraction=0.05)
 plt.tight_layout()
-plt.savefig('ptdiff_graph.png'.format(file), dpi=800)
+plt.savefig(os.path.join(dir_path, 'report/diffmat_graph.pdf'), dpi=800)
 plt.show()
 plt.close()
