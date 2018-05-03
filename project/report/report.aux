@@ -40,48 +40,63 @@
 \newlabel{phisum}{{8}{2}{}{equation.2.8}{}}
 \newlabel{feq}{{9}{2}{}{equation.2.9}{}}
 \newlabel{constant}{{11}{2}{}{equation.2.11}{}}
-\newlabel{fofx}{{12}{3}{}{equation.2.12}{}}
-\newlabel{finalceq}{{13}{3}{}{equation.2.13}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces The analytical solution to the Poisson equation with the boundary conditions of this section, summed over 500 terms. Qualitatively, one can see it fits the expected boundary conditions with slight deviations near the $x$ limits.\relax }}{3}{figure.caption.9}}
 \newlabel{analytical}{{2}{3}{The analytical solution to the Poisson equation with the boundary conditions of this section, summed over 500 terms. Qualitatively, one can see it fits the expected boundary conditions with slight deviations near the $x$ limits.\relax }{figure.caption.9}{}}
+\newlabel{fofx}{{12}{3}{}{equation.2.12}{}}
+\newlabel{finalceq}{{13}{3}{}{equation.2.13}{}}
+\newlabel{pointv}{{14}{3}{}{equation.2.14}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B}A Numerical Solution}{3}{section*.10}}
-\newlabel{sourceeq}{{14}{3}{}{equation.2.14}{}}
-\newlabel{taylor}{{15}{3}{}{equation.2.15}{}}
-\newlabel{deltaeq}{{16}{3}{}{equation.2.16}{}}
-\newlabel{xxeq}{{17}{3}{}{equation.2.17}{}}
-\newlabel{ptlxeq}{{18}{3}{}{equation.2.18}{}}
-\newlabel{params}{{19}{3}{}{equation.2.19}{}}
-\newlabel{numsourceeq}{{20}{3}{}{equation.2.20}{}}
+\newlabel{sourceeq}{{15}{3}{}{equation.2.15}{}}
+\newlabel{taylor}{{16}{3}{}{equation.2.16}{}}
+\newlabel{deltaeq}{{17}{3}{}{equation.2.17}{}}
+\newlabel{xxeq}{{18}{3}{}{equation.2.18}{}}
+\newlabel{ptlxeq}{{19}{3}{}{equation.2.19}{}}
+\newlabel{params}{{20}{3}{}{equation.2.20}{}}
 \citation{intel}
 \citation{mpich}
 \citation{mpe}
 \citation{git}
-\newlabel{jitereq}{{21}{4}{}{equation.2.21}{}}
+\citation{git}
+\newlabel{numsourceeq}{{21}{4}{}{equation.2.21}{}}
+\newlabel{jitereq}{{22}{4}{}{equation.2.22}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Methods}{4}{section*.11}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {A}Computational Environment}{4}{section*.12}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {B}Simulations and Data Reduction}{4}{section*.13}}
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Analysis and Results}{4}{section*.14}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {A}Relaxation Accuracy}{4}{section*.15}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.\relax }}{5}{figure.caption.16}}
+\newlabel{heatmapnosource}{{3}{5}{A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.\relax }{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A}Relaxation Accuracy}{5}{section*.15}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The surface plot of our relaxed potential, solving the specified boundary condition.\relax }}{5}{figure.caption.17}}
+\newlabel{graphnosource}{{4}{5}{The surface plot of our relaxed potential, solving the specified boundary condition.\relax }{figure.caption.17}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Statistical values referenced in the body of this section. Note the sharp decrease by an order of magnitude in $\sigma $ once we step away from the border of the boundary condition, where the convergence in the corners causes a large amount of error.\relax }}{5}{table.caption.18}}
+\newlabel{tab:stats}{{I}{5}{Statistical values referenced in the body of this section. Note the sharp decrease by an order of magnitude in $\sigma $ once we step away from the border of the boundary condition, where the convergence in the corners causes a large amount of error.\relax }{table.caption.18}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B}Timing}{5}{section*.20}}
+\citation{mpibook}
+\citation{mpibook}
+\citation{mpibook}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }}{6}{figure.caption.19}}
+\newlabel{diffmat}{{5}{6}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }{figure.caption.19}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Relaxation times for simulations run on the main workstation. It appears as though increasing beyond one processor does not increase simulation efficiency by very much.\relax }}{6}{table.caption.21}}
+\newlabel{tab:times}{{II}{6}{Relaxation times for simulations run on the main workstation. It appears as though increasing beyond one processor does not increase simulation efficiency by very much.\relax }{table.caption.21}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces A typical output of the \lstinline [basicstyle=\ttfamily  ,keywordstyle={}]{jumpshot} program using the MPE \lstinline [basicstyle=\ttfamily  ,keywordstyle={}]{.slog2} logfile. Here, the blue and purple bars are the two iterative sweeps in the main program loop. The white and green bars are the ghost zone communication after the sweeps. Not visible at this scale are the instantiation processes of the Cartesian process domain, and other one-time events.\relax }}{6}{figure.caption.22}}
+\newlabel{mpe4}{{6}{6}{A typical output of the \inline {jumpshot} program using the MPE \inline {.slog2} logfile. Here, the blue and purple bars are the two iterative sweeps in the main program loop. The white and green bars are the ghost zone communication after the sweeps. Not visible at this scale are the instantiation processes of the Cartesian process domain, and other one-time events.\relax }{figure.caption.22}{}}
+\newlabel{tceq}{{23}{6}{}{equation.4.23}{}}
+\newlabel{eff}{{24}{6}{}{equation.4.24}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{6}{section*.23}}
 \bibdata{reportNotes,refs}
 \bibcite{gromacs}{{1}{}{{}}{{}}}
 \bibcite{siesta}{{2}{}{{}}{{}}}
 \bibcite{mpibook}{{3}{}{{}}{{}}}
 \bibcite{intel}{{4}{}{{}}{{}}}
 \bibcite{mpich}{{5}{}{{}}{{}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.\relax }}{5}{figure.caption.16}}
-\newlabel{heatmapnosource}{{3}{5}{A heatmap of the values of our relaxed potential. The boundary condition can be seen in the linear increase from black to white along the top boundary, indicating an increasing voltage.\relax }{figure.caption.16}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The surface plot of our relaxed potential, solving the specified boundary condition.\relax }}{5}{figure.caption.17}}
-\newlabel{graphnosource}{{4}{5}{The surface plot of our relaxed potential, solving the specified boundary condition.\relax }{figure.caption.17}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }}{5}{figure.caption.19}}
-\newlabel{diffmat}{{5}{5}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.\relax }{figure.caption.19}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Appendices}{5}{section*.20}}
-\@writefile{toc}{\appendix }
-\@writefile{toc}{\appendix }
-\@writefile{toc}{\appendix }
-\@writefile{toc}{\contentsline {section}{\numberline {}References}{5}{section*.21}}
 \bibcite{mpe}{{6}{}{{}}{{}}}
 \bibcite{git}{{7}{}{{}}{{}}}
 \bibstyle{unsrt}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\newlabel{LastBibItem}{{7}{6}{}{section*.21}{}}
-\newlabel{LastPage}{{}{6}{}{}{}}
+\@writefile{toc}{\appendix }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Fourier Orthogonality}{7}{section*.24}}
+\@writefile{toc}{\contentsline {section}{\numberline {B}Coefficient Determination}{7}{section*.25}}
+\@writefile{toc}{\contentsline {section}{\numberline {C}Simulation Figures}{7}{section*.26}}
+\@writefile{toc}{\contentsline {section}{\numberline {}References}{7}{section*.28}}
+\newlabel{LastBibItem}{{7}{7}{}{section*.28}{}}
+\newlabel{LastPage}{{}{8}{}{}{}}

@@ -18,6 +18,9 @@
 \hypersetup{colorlinks=true, allcolors=blue}
 \def\inline{\lstinline[basicstyle=\ttfamily,keywordstyle={}]}
 
+
+\usepackage{needspace}
+
 \newcommand{\bv}[1]{\mathbf{#1}}
 
 
@@ -50,7 +53,7 @@ As a brief introduction, we describe the general concepts involved in parallel c
 As an example, we consider two vectors $\bv{a}$ and $\bv{b}$ in $\mathbb{R}^n$. When computing the dot product $$c = \bv{a}\cdot\bv{b}=\sum_i^n a_ib_i,$$ one needn't compute the product in any particular order. Going from $i=1$ to $i=n$ in sequential order is no different than choosing a random $i$ out of remaining products, and then summing them at the end. In this sense, the dot product is very much \textit{parallelizable}, in that anybody could compute a product in the sum without needing to know any other product. At the end, the results would be communicated back together to form the sum. In a computational sense, instead of computing the dot product in order by one process many different processes could be executed, each computing a separate product and drastically reducing computation time. In this particular example, we perform the same instruction on multiple data points, and thus this falls under the Single-Instruction-Multiple-Data (SIMD) umbrella of parallel computation. Other categories exist, involving varying amounts of instructions and data, but the concept remains the same -- one breaks up a parallelizable process into independent processes and combines whatever result at the end.
 
 
-\begin{figure}[H]
+\begin{figure}
 \includegraphics[scale=0.5]{parallel.png}
 \captionof{figure}{An example of a hybrid model of parallel processing, wherein the separate memory spaces (rectangles) have subprocesses (circles) that share the space, while communication over a network (gray blob) between the separate memory spaces doesn't allow universal access to the data being worked on. Reprinted from \cite{mpibook}.}
 \label{pic}
@@ -78,7 +81,7 @@ We here put forth an analytical solution to the sourceless Poisson equation \beg
 \phi(x, 0) &= 0\\
 \phi(x, b) &= f(x) \label{bcs}
 \end{aligned}
-\end{equation} where the upper border's boundary condition will remain arbitrary until we specify its form. Since Eq. \ref{sourceless} is linear and homogeneous, we assume that $phi(x,y)$ is separable such that \begin{equation} \phi(x,y)=X(x)Y(y). \label{separable} \end{equation} Now using this form of $\phi(x,y)$ and plugging into the Eq. \ref{sourceless} yields two decoupled ordinary differential equations \begin{equation}
+\end{equation} where the upper border's boundary condition will remain arbitrary until we specify its form. Since Eq. \ref{sourceless} is linear and homogeneous, we assume that $\phi(x,y)$ is separable such that \begin{equation} \phi(x,y)=X(x)Y(y). \label{separable} \end{equation} Now using this form of $\phi(x,y)$ and plugging into the Eq. \ref{sourceless} yields two decoupled ordinary differential equations \begin{equation}
 \frac{X''(x)}{X(x)} = -\frac{Y''(y)}{Y(y)} = - \lambda, \label{separated}
 \end{equation} and it is these equations with which we construct a solution. The minus sign in front of $\lambda$ is chosen for convenience. The solution to this type of differential equation is well-known, and we begin by stating the solution for $X(x)$: \begin{equation}
 X(x) = A\sin\left(\frac{n\pi x}{a}\right), \label{xeq}
@@ -109,7 +112,7 @@ c_n =& \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)}\times\biggl[\frac{-5a}{n^2\
 \end{aligned}
 \end{equation} Thus we have found an analytical solution solving the Poisson equation with the specified boundary potential. This solution is shown in Fig. \ref{analytical}.
 
-\begin{figure}[H]
+\begin{figure}
 	\hspace{-1cm}
 	\includegraphics[scale=0.7]{analytical.png}
 	\captionof{figure}{The analytical solution to the Poisson equation with the boundary conditions of this section, summed over 500 terms. Qualitatively, one can see it fits the expected boundary conditions with slight deviations near the $x$ limits.}
@@ -117,6 +120,8 @@ c_n =& \frac{2}{a\sinh\left(\frac{n\pi b}{a}\right)}\times\biggl[\frac{-5a}{n^2\
 \end{figure}
 
 Implementations of nonzero boundary terms are, of course, possible for the other sides of the region, and the above analysis extends to each side so long as the boundary conditions are linear. One may use the superposition principle to construct an arbitrary solution to boundary potentials at each side so long as the series functions are constructed individually -- that is, for each solution you can only assume one side is nonzero.
+
+We note, finally, that if there were a source (i.e., the Poisson equation became inhomogenous), the solution would be a superposition of the homogeneous one and the particular one for the source. But we know the potential for a range of source classifications, namely a point source. In this case, one gets the solution above added to \begin{equation} V_p = \frac{Q}{4\pi\epsilon_0 r}, \label{pointv} \end{equation} where $r$ is the distance from the location of the point source.
 
 \subsection{A Numerical Solution}
 
@@ -188,7 +193,7 @@ As the relaxation method did not yield different answers for different processor
 
 \subsection{Relaxation Accuracy}
 
-We here compare our sourceless relaxed solutions to the analytical form found in the Theory section. A heatmap of our result can be seen in Fig. \ref{heatmapnosource}, while a surface plot of the relaxed solution can be seen in Fig. \ref{graphnosource}.
+We here compare our sourceless relaxed solutions to the analytical form found in the Theory section. A heatmap of our result can be seen in Fig. \ref{heatmapnosource}, while a surface plot of the relaxed solution can be seen in Fig. \ref{graphnosource}. GIFs of the relaxation process (both the heatmap and surface plot visualizations) are available in provided GitHub repository \cite{git}.
 
 \begin{figure}
 	\includegraphics[scale=0.5]{four_bc_heatmap.png}
@@ -197,14 +202,19 @@ We here compare our sourceless relaxed solutions to the analytical form found in
 \end{figure}
 
 We compare the relaxed grid values from out potential mesh with those in Eq. \eqref{phisum}, using the substituted coefficients in Eq. \eqref{finalceq} summed to 500 terms. The maximum error value in taking the difference of these numerical and analytical solutions is $\sim 213$ volts, occurring at the edges of the boundary condition. The large error in the corners is explained by the summation error in the analytical solution -- had we summed to a larger number of terms the analytical solution would have converged closer to the limits of the $x$-axis. 
-\begin{figure}[H]
+
+
+\begin{figure}
 	\includegraphics[scale=0.5]{four_bc_graph.png}
 	\captionof{figure}{The surface plot of our relaxed potential, solving the specified boundary condition.}
 	\label{graphnosource}
 \end{figure}
-Up to the 500 terms we did, however, there is a small range of about $0.5$ cm from each border along the upper boundary where the potential sharply declines to zero to meet the left and right boundary conditions prematurely. It is in these regions that our error is prevalent. We note that taking the mean error across the difference region is a better statistic for accuracy of the relaxed result. We here quote the means and standard deviations in the errors of three different regions, excluding some $y$ value regions to demonstrate that the error is almost exclusively along the boundary $(x, y=15)$, indicated by the large drop in standard deviation of error values.
+
+
+Up to the 500 terms we did, however, there is a small range of about $0.5$ cm from each border along the upper boundary where the potential sharply declines to zero to meet the left and right boundary conditions prematurely. It is in these regions that our error is prevalent. We note that taking the mean error across the difference region is a better statistic for accuracy of the relaxed result. In Tab. \ref{tab:stats} we quote the means and standard deviations in the errors of three different regions, excluding some $y$ value regions to demonstrate that the error is almost exclusively along the boundary $(x, y=15)$, indicated by the large drop in standard deviation of error values.
+
 \begin{table}
-	\centering
+	\vspace{2ex}
 \begin{tabular}{|c|c|c|}
 	\hline
 	Statistic Region & Mean (V) & $\sigma$ (V)  \\ \hline
@@ -212,25 +222,103 @@ Up to the 500 terms we did, however, there is a small range of about $0.5$ cm fr
 	$y\in[0, 14]$ & $-0.118$ & $0.319$ \\ \hline
 	$y\in[0, 13]$ & $-0.110$ & $0.241$  \\ \hline
 \end{tabular}
+\vspace{1ex}
+\captionof{table}{Statistical values referenced in the body of this section. Note the sharp decrease by an order of magnitude in $\sigma$ once we step away from the border of the boundary condition, where the convergence in the corners causes a large amount of error.}
+\label{tab:stats}
 \end{table}
 
 A surface plot of the error is shown in Fig. \ref{diffmat}, further justifying the conclusion that the convergence of the analytical solution towards the corners of the region is the main source of error.
 
-\begin{figure}[H]
+\begin{figure}
 	\includegraphics[scale=0.5]{diffmat_graph.png}
 	\captionof{figure}{A surface plot of the difference between the analytical solution, summed to 500 terms, and the relaxed solution. The majority of the grid has essentially zero error, and the bulk of the error contribution occurs in the corners where the analytical solution has not yet converged.}
 	\label{diffmat}
 \end{figure}
 
 
-\section{Appendices}
+In the sourced solutions, $f(x,y)$ was set to be a point source at the middle of the grid with a strength of $ \frac{\rho}{\epsilon_0}=-100$ V. For sake of space, this heatmap and surface plot is shown in Appendix C, along with the appropriate error surface comparing the analytical solution to the relaxed grid. In it, one can see that the relaxed solution is much less singular at the point of the source. This intuitively makes sense, as the numerical solution of Eq. \eqref{jitereq} has no singularity at the point where we place the source, whereas the usual electrostatic potential Eq. \eqref{pointv} diverges as one approaches the source. Inherently, then, Jacobi iteration as used here will underestimate the potential near a small source. This is shown experimentally in our simulation by seeing the error is positive in the surface plot in Appendix C at the point source.
 
-\appendix{\bf Appendix A -- Fourier Orthogonality.}
 
-\appendix{\bf Appendix B -- Coefficient Determination.}
 
-\appendix{\bf Appendix C -- Simulation Figures.}
+\subsection{Timing}
 
+We summarize the results of our simulation times in Tab. \ref{tab:times}, with sourced and sourceless grid relaxations. We note the approximate halving of the times from one processor to two, where it remains at a steady computation time.
+
+\begin{table}
+	\vspace{2ex}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		\textbf{Processors} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4}\\ \hline
+		\textbf{Sourceless Time} (s) & 66.985 & 35.235 & 41.796 & 35.724\\ \hline
+		\textbf{Sourced Time} (s) & 61.741 & 34.845 & 39.814 & 36.622\\ \hline
+	\end{tabular}
+	\vspace{1ex}
+	\captionof{table}{Relaxation times for simulations run on the main workstation. It appears as though increasing beyond one processor does not increase simulation efficiency by very much.}
+	\label{tab:times}
+\end{table}
+
+We further note that running the sourceless simulations on a Mathlab machine decreases the simulation time to around 9 seconds -- a vast improvement over the times it takes on the workstation. This might be in part due to the increased processor number, although it is more likely that the increase in efficiency is due to the CPUs on the machines being much faster in general, with \inline{lscpu} denoting their processing speed around 3 GHz, almost twice as fast as the author's workstation.
+
+MPE logging allowed for the coarse characterization of the processing times of the program amongst the different subprocesses, and an indicative graphic of the output is shown in Fig. \ref{mpe4}. Not much could be gleaned from the logfile outputs, as the \inline{jumpshot} program provided with MPE for interpreting the logs didn't allow for much interactivity. However, it is clear from the graphs that the iteration processes of the relaxation take up the vast majority of the time, nominally less than $1/p$ percent of the total computation time.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.3]{four.png}
+	\captionof{figure}{A typical output of the \inline{jumpshot} program using the MPE \inline{.slog2} logfile. Here, the blue and purple bars are the two iterative sweeps in the main program loop. The white and green bars are the ghost zone communication after the sweeps. Not visible at this scale are the instantiation processes of the Cartesian process domain, and other one-time events.}
+	\label{mpe4}
+\end{figure}
+
+It is known that communication between the processes is much more time-consuming than operations on the data \cite{mpibook}, although Fig. \ref{mpe4} might suggest otherwise due to the sheer size difference between the number of operations compared to the number of communications. Each subprocess has on the order of $N_x\cdot N_y^i$, where $N_x$ is the number of bins the $x$-axis is divided into and $N_y^i$ is the number of bins along the $y$-axis apportioned to process $i$. This is compared to the communication of just $N_x$ values between processes, which can be reasonably short in comparison if the mesh spacing is rather fine.
+
+With a communication time model given by \begin{equation}
+T_c = 2\left(s+r\frac{8N_x}{p}\right),
+\label{tceq}
+\end{equation} where $s$ is the initialization time of the exchange of ghost zones, and $r$ is the byte-communication rate of $N_x$ 8-byte real numbers across $p$ processes (occurring twice) \cite{mpibook}, we can see that the number of processors will only help the communication time to a certain point. The operation time will scale much faster than the communication time, which is what we seem to see in our results. In fact, in the one-dimensional decomposition case that we carried out, the efficiency \begin{equation}
+e = \frac{1}{1+\frac{2(s+rn)p}{fn^2}}, \label{eff}
+\end{equation} where $f$ is the floating point operation time \cite{mpibook}, will increase at fixed $p$ for increasing $n$ (a given grid dimension size) and decreases at fixed $n$ for increasing $p$.
+
+\section{Conclusion}
+
+We have explored the utility of parallel processing, in particular the message-passing interface implementation of it. As a model study, we parallelize the Jacobi iterative solution to the Poisson model, both with and without a source. We have found that the relaxation is accurate away from divergent points (i.e., a point source) or away from where the analytical solution is not well converged. The timing of our simulation does not scale well with process number, and this is evident with the approximately constant simulation time (on the workstation) for any process number greater than one, although there is a substantial decrease in simulation time compared to a single process.
+
+Further studies of the subject might include a two-dimensional decomposition of the process domains, or hybridizing the parallelization to include shared memory interfaces, such as OpenMP. Additionally, GPU acceleration is another avenue of interest, using tools such as CUDA on machines that allow such performance boosts.
+
+
+
+\appendix
+\section{Fourier Orthogonality}
+
+We here prove that the Fourier components are orthogonal.
+
+Let \begin{equation}
+I = \int_{0}^a dx\cdot \sin\left(\frac{n\pi x}{a}\right)\sin\left(\frac{m\pi x}{a}\right).
+\end{equation} We use the identity \begin{equation}
+\sin(x)\sin(y)=\frac{1}{2}\left[\cos(x-y)-\cos(x+y)\right]
+\end{equation} to rewrite \begin{equation}
+\begin{aligned}
+I = \frac{1}{2}\int_0^a dx\cdot
+\end{aligned}
+\end{equation}
+
+\section{Coefficient Determination}
+
+
+
+\Needspace{5\baselineskip}
+\section{Simulation Figures}
+
+\begin{table}
+\begin{tabular}{cc}
+	\includegraphics[scale=0.5]{four_bcs_heatmap.png}
+&
+	\includegraphics[scale=0.5]{four_bcs_graph.png}\\ (a)&(b)\\
+
+	\includegraphics[scale=0.5]{ptdiff_graph.png} 
+	&
+	\includegraphics[scale=0.3]{msg.png} \\ (c)
+& (d)\\
+\end{tabular}
+\end{table}
 
 \bibliographystyle{unsrt}%Used BibTeX style is unsrt
 \bibliography{refs}
